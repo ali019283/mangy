@@ -2,6 +2,7 @@
 #include <X11/Xlib.h>
 #define modkey Mod4Mask
 Display *disp;
+Window root;
 XWindowAttributes attr;
 XEvent event;
 int mvrs(int x, int y, int mvx, int mvy){
@@ -11,10 +12,12 @@ int mvrs(int x, int y, int mvx, int mvy){
 int main(){
     if(!(disp = XOpenDisplay(0x0))){puts("cant open display"); return 1;}
     int arr[]={9, 24, 43, 44, 45, 46, 111, 113, 114, 116};
+    root = DefaultRootWindow(disp);
     for (int i = 0; i <= 9; i++){
-        XGrabKey(disp, arr[i], modkey, DefaultRootWindow(disp), True, GrabModeAsync, GrabModeAsync);
+        XGrabKey(disp, arr[i], modkey, root, True, GrabModeAsync, GrabModeAsync);
         printf("%d", arr[i]);
     }
+    XGrabButton(disp, 1, AnyModifier, root, True, ButtonPressMask, GrabModeAsync,GrabModeAsync, None, None);
     while(1){
         XNextEvent(disp, &event);
         if(event.type == KeyPress){
@@ -53,7 +56,7 @@ int main(){
 
                 }
             }
-        }
+        }else if(event.type == ButtonPress && event.xbutton.subwindow != None){XRaiseWindow(disp, event.xbutton.subwindow);}
     }
     XCloseDisplay(disp);
     return 0;
