@@ -7,9 +7,11 @@ XWindowAttributes attr;
 XEvent event;
 int main(){
 	if(!(disp = XOpenDisplay(0x0))){puts("cant open display"); return 1;}
-	int arr[]={escwm, killc, mvl, mvd, mvu, mvr};
+	int arr[]={mvl, mvd, mvu, mvr};
 	int childw, revert, sw, sy, snum;
 	root = DefaultRootWindow(disp);
+	XGrabKey(disp, escwm, mod1, root, True, GrabModeAsync, GrabModeAsync);
+	XGrabKey(disp, killc, mod1, root, True, GrabModeAsync, GrabModeAsync);
 	for (int i = 0; i < sizeof(arr)/sizeof(arr[0]); i++){
 		XGrabKey(disp, arr[i], mod1, root, True, GrabModeAsync, GrabModeAsync);
 		XGrabKey(disp, arr[i], mod1 | ShiftMask, root, True, GrabModeAsync, GrabModeAsync);
@@ -41,32 +43,48 @@ int main(){
 					case mvl:
 						if(event.xkey.state & ShiftMask)
 							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width-50, attr.height);
-						else if(event.xkey.state & ControlMask)
-							XMoveResizeWindow(disp, fw, 0, 0, sw/2, sy/2);	
+						else if(event.xkey.state & ControlMask){
+							if(!attr.x && !attr.y && attr.width == sw/2 && attr.height == sy/2)
+								XMoveResizeWindow(disp, fw, 0, 0, sw/2, sy);
+							else
+								XMoveResizeWindow(disp, fw, 0, 0, sw/2, sy/2);
+						}	
 						else
 							XMoveResizeWindow(disp, fw, attr.x-30, attr.y, attr.width, attr.height);	 
 						break;
 					case mvd:
 						if(event.xkey.state & ShiftMask)
 							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width, attr.height+50);
-						else if(event.xkey.state & ControlMask)
-							XMoveResizeWindow(disp, fw, 0, sy/2, sw/2, sy/2);
+						else if(event.xkey.state & ControlMask){
+							if(!attr.x && attr.y == sy/2 && attr.width == sw/2 && attr.height == sy/2)
+								XMoveResizeWindow(disp, fw, 0, sy/2, sw, sy/2);
+							else
+								XMoveResizeWindow(disp, fw, 0, sy/2, sw/2, sy/2);
+						}
 						else
 							XMoveResizeWindow(disp, fw, attr.x, attr.y+30, attr.width,attr.height);
 						break;
 					case mvu:
 						if(event.xkey.state & ShiftMask)
 							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width, attr.height-50);
-						else if(event.xkey.state & ControlMask)
-							XMoveResizeWindow(disp, fw, sw/2, 0, sw/2, sy/2);
+						else if(event.xkey.state & ControlMask){
+							if(attr.x == sw/2 && !attr.y && attr.width == sw/2 && attr.height == sy/2)
+								XMoveResizeWindow(disp, fw, 0, 0, sw, sy/2);
+							else
+								XMoveResizeWindow(disp, fw, sw/2, 0, sw/2, sy/2);
+						}
 						else
 							XMoveResizeWindow(disp, fw, attr.x, attr.y-30, attr.width, attr.height);
 						break;
 					case mvr:
 						if(event.xkey.state & ShiftMask)
 							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width+50, attr.height);
-						else if(event.xkey.state & ControlMask)
-							XMoveResizeWindow(disp, fw, sw/2, sy/2, sw/2, sy/2);
+						else if(event.xkey.state & ControlMask){
+							if(attr.x == sw/2 && attr.y == sy/2 && attr.width == sw/2 && attr.height == sy/2)
+								XMoveResizeWindow(disp, fw, sw/2, 0, sw/2, sy);
+							else
+								XMoveResizeWindow(disp, fw, sw/2, sy/2, sw/2, sy/2);
+						}
 						else
 							XMoveResizeWindow(disp, fw, attr.x+30, attr.y, attr.width, attr.height);
 						break;
