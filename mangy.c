@@ -1,24 +1,28 @@
 #include <stdio.h>
 #include <X11/Xlib.h>
+#include <unistd.h>
 #include "keymap.h"
 Display *disp;
 Window root, fw, parent, *children;
 XWindowAttributes attr;
 XEvent event;
+char *termin[]={"/usr/local/bin/st", NULL};
 int main(){
 	if(!(disp = XOpenDisplay(0x0))){puts("cant open display"); return 1;}
 	int arr[]={mvl, mvd, mvu, mvr};
+	int mvspeed = 30, rspeed=30;
 	int childw, revert, sw, sy, snum;
 	root = DefaultRootWindow(disp);
 	XGrabKey(disp, escwm, mod1, root, True, GrabModeAsync, GrabModeAsync);
 	XGrabKey(disp, killc, mod1, root, True, GrabModeAsync, GrabModeAsync);
+	XGrabKey(disp, fs, mod1, root, True, GrabModeAsync, GrabModeAsync);
+	XGrabKey(disp, term, mod1, root, True, GrabModeAsync, GrabModeAsync);
 	for (int i = 0; i < sizeof(arr)/sizeof(arr[0]); i++){
 		XGrabKey(disp, arr[i], mod1, root, True, GrabModeAsync, GrabModeAsync);
 		XGrabKey(disp, arr[i], mod1 | ShiftMask, root, True, GrabModeAsync, GrabModeAsync);
 		XGrabKey(disp, arr[i], mod1 | ControlMask, root, True, GrabModeAsync, GrabModeAsync);
 	}
 	XGrabButton(disp, 1, AnyModifier, root, True, ButtonPressMask, GrabModeAsync,GrabModeAsync, None, None);
-	XSetInputFocus(disp, event.xbutton.subwindow, RevertToParent, CurrentTime);
 	snum=DefaultScreen(disp);
 	sw=DisplayWidth(disp, snum);
 	sy=DisplayHeight(disp, snum);
@@ -26,23 +30,32 @@ int main(){
 		XNextEvent(disp, &event);
 		if (XQueryTree(disp, root, &root, &parent, &children, &childw)) {
 			if (childw == 1) {
-				XSetInputFocus(disp, children[0], RevertToParent, CurrentTime);
+				XSetInputFocus(disp, children[0], RevertToNone, CurrentTime);
 			}
 		}
 		if(event.type == KeyPress){
 			if(event.xkey.keycode == escwm){
 				break;
 			}
+			if(event.xkey.keycode == term){
+				pid_t pid; 
+				pid=fork(); 
+				if(pid == 0){
+					execv(termin[0], termin);
+				}
+			}
+			if(childw < 1) continue;
 			XGetInputFocus(disp, &fw, &revert);
 			if(fw != None){
 				XGetWindowAttributes(disp, fw, &attr);
 				switch(event.xkey.keycode){
 					case killc:    
 						XDestroyWindow(disp, fw);
+						XSetInputFocus(disp, root, RevertToNone, CurrentTime);
 						break;
 					case mvl:
 						if(event.xkey.state & ShiftMask)
-							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width-50, attr.height);
+							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width-rspeed, attr.height);
 						else if(event.xkey.state & ControlMask){
 							if(!attr.x && !attr.y && attr.width == sw/2 && attr.height == sy/2)
 								XMoveResizeWindow(disp, fw, 0, 0, sw/2, sy);
@@ -50,11 +63,11 @@ int main(){
 								XMoveResizeWindow(disp, fw, 0, 0, sw/2, sy/2);
 						}	
 						else
-							XMoveResizeWindow(disp, fw, attr.x-30, attr.y, attr.width, attr.height);	 
+							XMoveResizeWindow(disp, fw, attr.x-mvspeed, attr.y, attr.width, attr.height);	 
 						break;
 					case mvd:
 						if(event.xkey.state & ShiftMask)
-							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width, attr.height+50);
+							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width, attr.height+rspeed);
 						else if(event.xkey.state & ControlMask){
 							if(!attr.x && attr.y == sy/2 && attr.width == sw/2 && attr.height == sy/2)
 								XMoveResizeWindow(disp, fw, 0, sy/2, sw, sy/2);
@@ -62,11 +75,11 @@ int main(){
 								XMoveResizeWindow(disp, fw, 0, sy/2, sw/2, sy/2);
 						}
 						else
-							XMoveResizeWindow(disp, fw, attr.x, attr.y+30, attr.width,attr.height);
+							XMoveResizeWindow(disp, fw, attr.x, attr.y+mvspeed, attr.width,attr.height);
 						break;
 					case mvu:
 						if(event.xkey.state & ShiftMask)
-							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width, attr.height-50);
+							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width, attr.height-rspeed);
 						else if(event.xkey.state & ControlMask){
 							if(attr.x == sw/2 && !attr.y && attr.width == sw/2 && attr.height == sy/2)
 								XMoveResizeWindow(disp, fw, 0, 0, sw, sy/2);
@@ -74,11 +87,11 @@ int main(){
 								XMoveResizeWindow(disp, fw, sw/2, 0, sw/2, sy/2);
 						}
 						else
-							XMoveResizeWindow(disp, fw, attr.x, attr.y-30, attr.width, attr.height);
+							XMoveResizeWindow(disp, fw, attr.x, attr.y-mvspeed, attr.width, attr.height);
 						break;
 					case mvr:
 						if(event.xkey.state & ShiftMask)
-							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width+50, attr.height);
+							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width+rspeed, attr.height);
 						else if(event.xkey.state & ControlMask){
 							if(attr.x == sw/2 && attr.y == sy/2 && attr.width == sw/2 && attr.height == sy/2)
 								XMoveResizeWindow(disp, fw, sw/2, 0, sw/2, sy);
@@ -86,13 +99,15 @@ int main(){
 								XMoveResizeWindow(disp, fw, sw/2, sy/2, sw/2, sy/2);
 						}
 						else
-							XMoveResizeWindow(disp, fw, attr.x+30, attr.y, attr.width, attr.height);
+							XMoveResizeWindow(disp, fw, attr.x+mvspeed, attr.y, attr.width, attr.height);
 						break;
+					case fs:
+						XMoveResizeWindow(disp, fw, 0, 0, sw, sy);
 				}
 			}
 		}else if(event.type == ButtonPress && event.xbutton.subwindow != None){
 			XRaiseWindow(disp, event.xbutton.subwindow);
-			XSetInputFocus(disp, event.xbutton.subwindow, RevertToParent, CurrentTime);
+			XSetInputFocus(disp, event.xbutton.subwindow, RevertToNone, CurrentTime);
 		}
 	}
 	XCloseDisplay(disp);

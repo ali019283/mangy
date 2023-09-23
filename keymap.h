@@ -1,6 +1,8 @@
 #define mod1 Mod1Mask
 #define killc 24 //q
 #define escwm 9 //esc
+#define fs 41 //f
+#define term 36 //enter
 #define mvl 43 //h
 #define mvd 44 //j
 #define mvu 45 //k
