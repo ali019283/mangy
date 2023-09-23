@@ -11,9 +11,9 @@ int mvrs(int x, int y, int mvx, int mvy){
 }
 int main(){
     if(!(disp = XOpenDisplay(0x0))){puts("cant open display"); return 1;}
-    int arr[]={escwm, killc, mvl, mvd, mvu, mvr,};
+    int arr[]={escwm, killc, mvl, mvd, mvu, mvr};
     root = DefaultRootWindow(disp);
-    for (int i = 0; i <= 9; i++){
+    for (int i = 0; i < sizeof(arr)/sizeof(arr[0]); i++){
         XGrabKey(disp, arr[i], mod1, root, True, GrabModeAsync, GrabModeAsync);
 	XGrabKey(disp, arr[i], mod1 | ShiftMask, root, True, GrabModeAsync, GrabModeAsync);
         printf("%d", arr[i]);
