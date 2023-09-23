@@ -41,36 +41,32 @@ int main(){
 					case mvl:
 						if(event.xkey.state & ShiftMask)
 							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width-50, attr.height);
-						else if(event.xkey.state & ControlMask){
+						else if(event.xkey.state & ControlMask)
 							XMoveResizeWindow(disp, fw, 0, 0, sw/2, sy/2);	
-						}
 						else
 							XMoveResizeWindow(disp, fw, attr.x-30, attr.y, attr.width, attr.height);	 
 						break;
 					case mvd:
 						if(event.xkey.state & ShiftMask)
 							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width, attr.height+50);
-						else if(event.xkey.state & ControlMask){
+						else if(event.xkey.state & ControlMask)
 							XMoveResizeWindow(disp, fw, 0, sy/2, sw/2, sy/2);
-						}
 						else
 							XMoveResizeWindow(disp, fw, attr.x, attr.y+30, attr.width,attr.height);
 						break;
 					case mvu:
 						if(event.xkey.state & ShiftMask)
 							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width, attr.height-50);
-						else if(event.xkey.state & ControlMask){
+						else if(event.xkey.state & ControlMask)
 							XMoveResizeWindow(disp, fw, sw/2, 0, sw/2, sy/2);
-						}
 						else
 							XMoveResizeWindow(disp, fw, attr.x, attr.y-30, attr.width, attr.height);
 						break;
 					case mvr:
 						if(event.xkey.state & ShiftMask)
 							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width+50, attr.height);
-						else if(event.xkey.state & ControlMask){
+						else if(event.xkey.state & ControlMask)
 							XMoveResizeWindow(disp, fw, sw/2, sy/2, sw/2, sy/2);
-						}
 						else
 							XMoveResizeWindow(disp, fw, attr.x+30, attr.y, attr.width, attr.height);
 						break;
