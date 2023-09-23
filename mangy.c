@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <X11/Xlib.h>
-#include <X11/Xutil.h>
 #include "keymap.h"
 Display *disp;
 Window root;
@@ -60,10 +59,8 @@ int main(){
                 }
             }
         }else if(event.type == ButtonPress && event.xbutton.subwindow != None){
-		Window cw = event.xbutton.subwindow;
 		XRaiseWindow(disp, event.xbutton.subwindow);
-		XSetInputFocus(disp, cw, RevertToParent, CurrentTime);
-		fw = cw;
+		XSetInputFocus(disp, event.xbutton.subwindow, RevertToParent, CurrentTime);
 	}
     }
     XCloseDisplay(disp);
