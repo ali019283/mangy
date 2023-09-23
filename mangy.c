@@ -9,18 +9,16 @@ XEvent event;
 char *termin[]={"/usr/local/bin/st", NULL};
 int main(){
 	if(!(disp = XOpenDisplay(0x0))){puts("cant open display"); return 1;}
-	int arr[]={mvl, mvd, mvu, mvr};
+	int arr[]={escwm, killc, fs, term, mvl, mvd, mvu, mvr};
 	int mvspeed = 30, rspeed=30;
 	int childw, revert, sw, sy, snum;
 	root = DefaultRootWindow(disp);
-	XGrabKey(disp, escwm, mod1, root, True, GrabModeAsync, GrabModeAsync);
-	XGrabKey(disp, killc, mod1, root, True, GrabModeAsync, GrabModeAsync);
-	XGrabKey(disp, fs, mod1, root, True, GrabModeAsync, GrabModeAsync);
-	XGrabKey(disp, term, mod1, root, True, GrabModeAsync, GrabModeAsync);
 	for (int i = 0; i < sizeof(arr)/sizeof(arr[0]); i++){
 		XGrabKey(disp, arr[i], mod1, root, True, GrabModeAsync, GrabModeAsync);
-		XGrabKey(disp, arr[i], mod1 | ShiftMask, root, True, GrabModeAsync, GrabModeAsync);
-		XGrabKey(disp, arr[i], mod1 | ControlMask, root, True, GrabModeAsync, GrabModeAsync);
+		if(i>3){
+			XGrabKey(disp, arr[i], mod1 | ShiftMask, root, True, GrabModeAsync, GrabModeAsync);
+			XGrabKey(disp, arr[i], mod1 | ControlMask, root, True, GrabModeAsync, GrabModeAsync);
+		}
 	}
 	XGrabButton(disp, 1, AnyModifier, root, True, ButtonPressMask, GrabModeAsync,GrabModeAsync, None, None);
 	snum=DefaultScreen(disp);
