@@ -1,22 +1,24 @@
 #include <stdio.h>
 #include <X11/Xlib.h>
+#include <X11/Xutil.h>
 #include "keymap.h"
 Display *disp;
 Window root;
+Window fw;
 XWindowAttributes attr;
 XEvent event;
 int mvrs(int x, int y, int mvx, int mvy){
-    XGetWindowAttributes(disp, event.xkey.subwindow, &attr);
-    XMoveResizeWindow(disp, event.xkey.subwindow, attr.x+x, attr.y+y, attr.width+mvx, attr.height+mvy);
+    XGetWindowAttributes(disp, fw, &attr);
+    XMoveResizeWindow(disp, fw, attr.x+x, attr.y+y, attr.width+mvx, attr.height+mvy);
 }
 int main(){
     if(!(disp = XOpenDisplay(0x0))){puts("cant open display"); return 1;}
     int arr[]={escwm, killc, mvl, mvd, mvu, mvr};
+    int revert;
     root = DefaultRootWindow(disp);
     for (int i = 0; i < sizeof(arr)/sizeof(arr[0]); i++){
         XGrabKey(disp, arr[i], mod1, root, True, GrabModeAsync, GrabModeAsync);
 	XGrabKey(disp, arr[i], mod1 | ShiftMask, root, True, GrabModeAsync, GrabModeAsync);
-        printf("%d", arr[i]);
     }
     XGrabButton(disp, 1, AnyModifier, root, True, ButtonPressMask, GrabModeAsync,GrabModeAsync, None, None);
     while(1){
@@ -25,10 +27,11 @@ int main(){
             if(event.xkey.keycode == escwm){
                 break;
             }
-            if(event.xkey.subwindow != None){
+            XGetInputFocus(disp, &fw, &revert);
+	    if(fw != None){
                 switch(event.xkey.keycode){
                     case killc:    
-                        XDestroyWindow(disp, event.xkey.subwindow);
+                        XDestroyWindow(disp, fw);
                         break;
                     case mvl:
 			if(event.xkey.state & ShiftMask)
@@ -56,7 +59,12 @@ int main(){
                         break;
                 }
             }
-        }else if(event.type == ButtonPress && event.xbutton.subwindow != None){XRaiseWindow(disp, event.xbutton.subwindow);}
+        }else if(event.type == ButtonPress && event.xbutton.subwindow != None){
+		Window cw = event.xbutton.subwindow;
+		XRaiseWindow(disp, event.xbutton.subwindow);
+		XSetInputFocus(disp, cw, RevertToParent, CurrentTime);
+		fw = cw;
+	}
     }
     XCloseDisplay(disp);
     return 0;
