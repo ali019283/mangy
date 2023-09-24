@@ -23,7 +23,7 @@ int main(){
 			XGrabKey(disp, arr[i], mod1 | ControlMask, root, True, GrabModeAsync, GrabModeAsync);
 		}
 	}
-	XGrabButton(disp, 1, AnyModifier, root, True, ButtonPressMask, GrabModeAsync,GrabModeAsync, None, None);
+	XGrabButton(disp, 1, mod1, root, True, ButtonPressMask, GrabModeAsync,GrabModeAsync, None, None);
 	snum=DefaultScreen(disp);
 	sw=DisplayWidth(disp, snum);
 	sy=DisplayHeight(disp, snum);
