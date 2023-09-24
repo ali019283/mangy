@@ -7,15 +7,18 @@ Window root, fw, parent, *children;
 XWindowAttributes attr;
 XEvent event;
 char *termin[]={"/usr/local/bin/st", NULL};
+char *brows[]={"/usr/bin/chromium", NULL};
+char *dmenu[] = { "/usr/local/bin/dmenu_run", NULL };
 int main(){
 	if(!(disp = XOpenDisplay(0x0))){puts("cant open display"); return 1;}
-	int arr[]={escwm, killc, fs, term, mvl, mvd, mvu, mvr};
+	int arr[]={escwm, killc, fs, term, br, dm, mvl, mvd, mvu, mvr};
 	int mvspeed = 30, rspeed=30;
 	int childw, revert, sw, sy, snum;
 	root = DefaultRootWindow(disp);
-	for (int i = 0; i < sizeof(arr)/sizeof(arr[0]); i++){
+	int len = sizeof(arr)/sizeof(arr[0]);
+	for (int i = 0; i < len; i++){
 		XGrabKey(disp, arr[i], mod1, root, True, GrabModeAsync, GrabModeAsync);
-		if(i>3){
+		if(i>len-5){
 			XGrabKey(disp, arr[i], mod1 | ShiftMask, root, True, GrabModeAsync, GrabModeAsync);
 			XGrabKey(disp, arr[i], mod1 | ControlMask, root, True, GrabModeAsync, GrabModeAsync);
 		}
@@ -35,12 +38,20 @@ int main(){
 			if(event.xkey.keycode == escwm){
 				break;
 			}
-			if(event.xkey.keycode == term){
+			else if(event.xkey.keycode == term){
 				pid_t pid; 
-				pid=fork(); 
-				if(pid == 0){
-					execv(termin[0], termin);
-				}
+				pid = fork(); 
+				if(pid == 0) execv(termin[0], termin);
+			}
+			else if(event.xkey.keycode == br){
+				pid_t pid;
+				pid = fork();
+				if(pid == 0) execv(brows[0], brows);
+			}
+			else if(event.xkey.keycode == dm){
+				pid_t pid;
+				pid = fork();
+				if(pid == 0) execv(dmenu[0], dmenu);
 			}
 			if(childw < 1) continue;
 			XGetInputFocus(disp, &fw, &revert);
