@@ -10,6 +10,7 @@ don't expect much out of it, it may lack some important features and it may have
 | -> modkey + esc            Closes the connection to X server      |
 | -> modkey + q              Closes the focused window              |
 | -> modkey + f              Makes focused window fullscreen        |
+| -> modkey + g              Switch the focus between windows       |
 | -> modkey + enter          Opens terminal                         |
 | -> modkey + h,j,k,l        Moves focused window                   |
 | -> modkey + Shft + h,j,k,l Resizes focused window                 |

@@ -11,7 +11,7 @@ char *brows[]={"/usr/bin/chromium", NULL};
 char *dmenu[] = { "/usr/local/bin/dmenu_run", NULL };
 int main(){
 	if(!(disp = XOpenDisplay(0x0))){puts("cant open display"); return 1;}
-	int arr[]={escwm, killc, fs, term, br, dm, mvl, mvd, mvu, mvr};
+	int arr[]={escwm, killc, fs, sf, term, br, dm, mvl, mvd, mvu, mvr};
 	int mvspeed = 30, rspeed=30;
 	int childw, revert, sw, sy, snum;
 	root = DefaultRootWindow(disp);
@@ -60,7 +60,12 @@ int main(){
 				switch(event.xkey.keycode){
 					case killc:    
 						XDestroyWindow(disp, fw);
-						XSetInputFocus(disp, root, RevertToNone, CurrentTime);
+						if(XQueryTree(disp, root, &root, &parent, &children, &childw)){
+							if(childw >= 1)
+								XSetInputFocus(disp, children[0], RevertToNone, CurrentTime);
+							else
+								XSetInputFocus(disp, root, RevertToNone, CurrentTime);
+						}
 						break;
 					case mvl:
 						if(event.xkey.state & ShiftMask)
@@ -112,6 +117,15 @@ int main(){
 						break;
 					case fs:
 						XMoveResizeWindow(disp, fw, 0, 0, sw, sy);
+					case sf:
+						for(int a = 0; a < childw; a++){
+							if(children[a] == fw){
+								if(a+1 < childw)
+									XSetInputFocus(disp, children[a+1], RevertToNone, CurrentTime);
+								else
+									XSetInputFocus(disp, children[0], RevertToNone, CurrentTime);
+							}
+						}
 				}
 			}
 		}else if(event.type == ButtonPress && event.xbutton.subwindow != None){
