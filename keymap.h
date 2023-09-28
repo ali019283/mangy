@@ -3,6 +3,7 @@
 #define escwm 9 //esc
 #define br 25 //w
 #define dm 40 //d
+#define tl 28 //t
 #define fs 41 //f
 #define term 36 //enter
 #define sf 42 //g

@@ -11,7 +11,7 @@ char *brows[]={"/usr/bin/chromium", NULL};
 char *dmenu[] = { "/usr/local/bin/dmenu_run", NULL };
 int main(){
 	if(!(disp = XOpenDisplay(0x0))){puts("cant open display"); return 1;}
-	int arr[]={escwm, killc, fs, sf, term, br, dm, mvl, mvd, mvu, mvr};
+	int arr[]={escwm, killc, tl, fs, sf, term, br, dm, mvl, mvd, mvu, mvr};
 	int mvspeed = 30, rspeed=30;
 	int childw, revert, sw, sy, snum;
 	root = DefaultRootWindow(disp);
@@ -117,6 +117,7 @@ int main(){
 						break;
 					case fs:
 						XMoveResizeWindow(disp, fw, 0, 0, sw, sy);
+						break;
 					case sf:
 						for(int a = 0; a < childw; a++){
 							if(children[a] == fw){
@@ -126,6 +127,18 @@ int main(){
 									XSetInputFocus(disp, children[0], RevertToNone, CurrentTime);
 							}
 						}
+						break;
+					case tl:
+						if(childw > 1) XMoveResizeWindow(disp, fw, 0, 0, sw/2, sy);
+						else XMoveResizeWindow(disp, fw, 0, 0, sw, sy);
+						int chnotfw = 0;
+						for (int y = 0; y < childw; y++){
+							if(children[y] != fw){
+								XMoveResizeWindow(disp, children[y], sw/2, chnotfw*(sy/(childw-1)), sw/2, sy/(childw-1));
+								chnotfw++;
+							}
+						}
+						break;
 				}
 			}
 		}else if(event.type == ButtonPress && event.xbutton.subwindow != None){
