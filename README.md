@@ -24,6 +24,7 @@ you can change the default terminal(st)/browser(chromium)/dmenu in mangy.c
 # TODO: 
 ```
 -add CreateNotify and DestroyNotify events
+-add mfacts (horizantal and vertical)
 -add border
 -add gaps
 -add different tiling methods
