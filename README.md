@@ -22,6 +22,7 @@ as for other keys they are specified by their keycodes in keymap.h
 you can change the default terminal(st)/browser(chromium)/dmenu in mangy.c
 
 # TODO: 
+```
 -add CreateNotify and DestroyNotify events
 -add border
 -add gaps
@@ -30,7 +31,7 @@ you can change the default terminal(st)/browser(chromium)/dmenu in mangy.c
  ├──> grid
  ├──> fibonacci
  └──> binary space partitioning (prob wont add cuz its complicated asf)
-
+```
 # installing / compiling
 run 
 ```
