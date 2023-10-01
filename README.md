@@ -9,62 +9,27 @@ don't expect much out of it, it may lack some important features and it may have
 | -> exec mangy                                                     |
 | -> modkey + esc            Closes the connection to X server      |
 | -> modkey + q              Closes the focused window              |
+| -> modkey + t              Changes the active window place tiling |
 | -> modkey + f              Makes focused window fullscreen        |
 | -> modkey + g              Switch the focus between windows       |
 | -> modkey + enter          Opens terminal                         |
 | -> modkey + h,j,k,l        Moves focused window                   |
 | -> modkey + Shft + h,j,k,l Resizes focused window                 |
-| -> modkey + Ctrl + h,j,k,l Tiles focused window                   |
 +-------------------------------------------------------------------+
 ```
 modkey by default is Mod1Mask, you can change it in keymap.h
 as for other keys they are specified by their keycodes in keymap.h
-you can change the default terminal(st) in mangy.c
+you can change the default terminal(st)/browser(chromium)/dmenu in mangy.c
 
-# tile layout
-```
-modkey + ctrl + h toggles between
-+-----------+-----------+  +-----------+-----------+
-|           |           |  |           |           |
-|     h     |           |  |           |           |
-|           |           |  |           |           |
-|-----------|           |  |     h     |           |
-|                       |  |           |           |
-|                       |  |           |           |
-|                       |  |           |           |
-+-----------+-----+-----+  +-----------+-----+-----+
-modkey + ctrl + j toggles between
-+-----------+-----------+  +-----------+-----------+
-|                       |  |                       |
-|                       |  |                       |
-|                       |  |                       |
-|-----------|           |  |-----------|-----------|
-|           |           |  |                       |
-|     j     |           |  |           j           |
-|           |           |  |                       |
-+-----------+-----+-----+  +-----------+-----+-----+
-modkey + ctrl + k toggles between
-+-----------+-----------+  +-----------+-----------+
-|           |           |  |                       |
-|           |     k     |  |           k           |
-|           |           |  |                       |
-|           |-----------|  |-----------------------|
-|                       |  |                       |
-|                       |  |                       |
-|                       |  |                       |
-+-----------+-----+-----+  +-----------+-----+-----+
-modkey + ctrl + l toggles between
-+-----------+-----------+  +-----------+-----------+
-|                       |  |           |           |
-|                       |  |           |           |
-|                       |  |           |           |
-|           |-----------|  |           |     l     |
-|           |           |  |           |           |
-|           |     l     |  |           |           |
-|           |           |  |           |           |
-+-----------+-----+-----+  +-----------+-----+-----+
-
-```
+# TODO: 
+-add CreateNotify and DestroyNotify events
+-add border
+-add gaps
+-add different tiling methods
+ ├──> dwm tiling [DONE]
+ ├──> grid
+ ├──> fibonacci
+ └──> binary space partitioning (prob wont add cuz its complicated asf)
 
 # installing / compiling
 run 
