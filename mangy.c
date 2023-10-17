@@ -6,21 +6,21 @@ Display *disp;
 Window root, fw, parent, *children;
 XWindowAttributes attr;
 XEvent event;
-int childw, revert, sw, sy, snum, chnotfw, mode = 1;
+int childw, revert, sw, sy, snum, mfact = 0, chnotfw, mode = 1;
 char *termin[]={"/usr/local/bin/st", NULL};
 char *brows[]={"/usr/bin/chromium", NULL};
 char *dmenu[] = { "/usr/local/bin/dmenu_run", NULL };
 int tile(){
-	if(mode == 1) XMoveResizeWindow(disp, fw, 0, 0, sw/2, sy);
-	else if(mode == 2) XMoveResizeWindow(disp, fw, 0, sy/2, sw, sy/2);
-	else if(mode == 3) XMoveResizeWindow(disp, fw, 0, 0, sw, sy/2);
-	else if(mode == 4) XMoveResizeWindow(disp, fw, sw/2, 0, sw/2, sy);
+	if(mode == 1) XMoveResizeWindow(disp, fw, 0, 0, sw/2+mfact, sy);
+	else if(mode == 2) XMoveResizeWindow(disp, fw, 0, sy/2-mfact, sw, sy/2+mfact);
+	else if(mode == 3) XMoveResizeWindow(disp, fw, 0, 0, sw, sy/2-mfact);
+	else if(mode == 4) XMoveResizeWindow(disp, fw, sw/2+mfact, 0, sw/2-mfact, sy);
 	for(int y = 0; y < childw; y++){
 		if(children[y] != fw){
-			if(mode == 1) XMoveResizeWindow(disp, children[y], sw/2, chnotfw*(sy/(childw-1)), sw/2, sy/(childw-1));
-			else if(mode == 2) XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1)), 0, sw/(childw-1), sy/2);
-			else if(mode == 3) XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1)), sy/2, sw/(childw-1), sy/2);
-			else if(mode == 4) XMoveResizeWindow(disp, children[y], 0, chnotfw*(sy/(childw-1)), sw/2, sy/(childw-1));
+			if(mode == 1) XMoveResizeWindow(disp, children[y], sw/2+mfact, chnotfw*(sy/(childw-1)), sw/2-mfact, sy/(childw-1));
+			else if(mode == 2) XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1)), 0, sw/(childw-1), sy/2-mfact);
+			else if(mode == 3) XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1)), sy/2-mfact, sw/(childw-1), sy/2+mfact);
+			else if(mode == 4) XMoveResizeWindow(disp, children[y], 0, chnotfw*(sy/(childw-1)), sw/2+mfact, sy/(childw-1));
 			chnotfw++;
 		}
 	}
@@ -95,7 +95,8 @@ int main(){
 						if(event.xkey.state & ShiftMask)
 							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width-rspeed, attr.height);
 						else
-							XMoveResizeWindow(disp, fw, attr.x-mvspeed, attr.y, attr.width, attr.height);	 
+							if(mode == 0) XMoveResizeWindow(disp, fw, attr.x-mvspeed, attr.y, attr.width, attr.height);	 
+							else mfact-=50;
 						break;
 					case mvd:
 						if(event.xkey.state & ShiftMask)
@@ -113,7 +114,8 @@ int main(){
 						if(event.xkey.state & ShiftMask)
 							XMoveResizeWindow(disp, fw, attr.x, attr.y, attr.width+rspeed, attr.height);
 						else
-							XMoveResizeWindow(disp, fw, attr.x+mvspeed, attr.y, attr.width, attr.height);
+							if(mode == 0) XMoveResizeWindow(disp, fw, attr.x+mvspeed, attr.y, attr.width, attr.height);
+							else mfact+=50;
 						break;
 					case fs:
 						XMoveResizeWindow(disp, fw, 0, 0, sw, sy);
