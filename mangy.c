@@ -6,21 +6,41 @@ Display *disp;
 Window root, fw, parent, *children;
 XWindowAttributes attr;
 XEvent event;
-int childw, revert, sw, sy, snum, mfact = 0, chnotfw, mode = 1;
+int childw, revert, sw, sy, snum, chnotfw, gaps = 10, mfact = 0, mode = 1;
 char *termin[]={"/usr/local/bin/st", NULL};
 char *brows[]={"/usr/bin/chromium", NULL};
 char *dmenu[] = { "/usr/local/bin/dmenu_run", NULL };
 int tile(){
-	if(mode == 1) XMoveResizeWindow(disp, fw, 0, 0, sw/2+mfact, sy);
-	else if(mode == 2) XMoveResizeWindow(disp, fw, 0, sy/2-mfact, sw, sy/2+mfact);
-	else if(mode == 3) XMoveResizeWindow(disp, fw, 0, 0, sw, sy/2-mfact);
-	else if(mode == 4) XMoveResizeWindow(disp, fw, sw/2+mfact, 0, sw/2-mfact, sy);
+	if(mode == 1) XMoveResizeWindow(disp, fw, gaps, gaps, sw/2+mfact-gaps, sy-(gaps*2));
+	else if(mode == 2) XMoveResizeWindow(disp, fw, gaps, sy/2-mfact+gaps, sw-(gaps*2), sy/2+mfact-(gaps*2));
+	else if(mode == 3) XMoveResizeWindow(disp, fw, gaps, gaps, sw-(gaps*2), sy/2-mfact-gaps);
+	else if(mode == 4) XMoveResizeWindow(disp, fw, sw/2+mfact+gaps, gaps, sw/2-mfact-(gaps*2), sy-(gaps*2));
 	for(int y = 0; y < childw; y++){
 		if(children[y] != fw){
-			if(mode == 1) XMoveResizeWindow(disp, children[y], sw/2+mfact, chnotfw*(sy/(childw-1)), sw/2-mfact, sy/(childw-1));
-			else if(mode == 2) XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1)), 0, sw/(childw-1), sy/2-mfact);
-			else if(mode == 3) XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1)), sy/2-mfact, sw/(childw-1), sy/2+mfact);
-			else if(mode == 4) XMoveResizeWindow(disp, children[y], 0, chnotfw*(sy/(childw-1)), sw/2+mfact, sy/(childw-1));
+			if(mode == 1){
+				XMoveResizeWindow(disp, children[y], sw/2+mfact+gaps, chnotfw*(sy/(childw-1))+gaps, sw/2-mfact-(gaps*2), sy/(childw-1)-gaps);
+				if(chnotfw==childw-2){
+					XMoveResizeWindow(disp, children[y], sw/2+mfact+gaps, chnotfw*(sy/(childw-1))+gaps, sw/2-mfact-(gaps*2), sy/(childw-1)-(gaps*2));
+				}
+			}
+			else if(mode == 2){
+				XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1))+gaps, gaps, sw/(childw-1)-gaps, sy/2-mfact-gaps);
+				if(chnotfw==childw-2){
+					XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1))+gaps, gaps, sw/(childw-1)-(gaps*2), sy/2-mfact-gaps);
+				}
+			}
+			else if(mode == 3){
+				XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1))+gaps, sy/2-mfact+gaps, sw/(childw-1)-gaps, sy/2+mfact-(gaps*2));
+				if(chnotfw==childw-2){
+					XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1))+gaps, sy/2-mfact+gaps, sw/(childw-1)-(gaps*2), sy/2+mfact-(gaps*2));
+				}
+			}
+			else if(mode == 4){
+				XMoveResizeWindow(disp, children[y], gaps, chnotfw*(sy/(childw-1))+gaps, sw/2+mfact-gaps, sy/(childw-1)-gaps);
+				if(chnotfw==childw-2){
+					XMoveResizeWindow(disp, children[y], gaps, chnotfw*(sy/(childw-1))+gaps, sw/2+mfact-gaps, sy/(childw-1)-(gaps*2));
+				}
+			}
 			chnotfw++;
 		}
 	}
