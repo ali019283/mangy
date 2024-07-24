@@ -1,15 +1,21 @@
 #include <stdio.h>
 #include <X11/Xlib.h>
 #include <unistd.h>
+#include <math.h>
 #include "keymap.h"
 Display *disp;
 Window root, fw, parent, *children;
 XWindowAttributes attr;
 XEvent event;
-int childw, revert, sw, sy, snum, chnotfw, gaps = 10, mfact = 0, mode = 1;
+int childw, revert, sw, sy, snum, chnotfw;
+
+/* CONFIG */
+int gaps = 10, mfact = 0, mode = 1;
 char *termin[]={"/usr/local/bin/st", NULL};
 char *brows[]={"/usr/bin/chromium", NULL};
 char *dmenu[] = { "/usr/local/bin/dmenu_run", NULL };
+/* CONFIG END */
+
 int tile(){
 	if(mode == 1) XMoveResizeWindow(disp, fw, gaps, gaps, sw/2+mfact-gaps, sy-(gaps*2));
 	else if(mode == 2) XMoveResizeWindow(disp, fw, gaps, sy/2-mfact+gaps, sw-(gaps*2), sy/2+mfact-(gaps*2));
@@ -48,7 +54,7 @@ int tile(){
 	return 0;
 }
 int main(){
-	if(!(disp = XOpenDisplay(0x0))){puts("cant open display"); return 1;}
+	if(!(disp = XOpenDisplay(0x0))){puts("cant open display :("); return 1;}
 	int arr[]={escwm, killc, tg, fs, sf, term, br, dm, mvl, mvd, mvu, mvr};
 	int mvspeed = 30, rspeed=30;
 	root = DefaultRootWindow(disp);
@@ -60,9 +66,9 @@ int main(){
 		}
 	}
 	XGrabButton(disp, 1, mod1, root, True, ButtonPressMask, GrabModeAsync,GrabModeAsync, None, None);
-	snum=DefaultScreen(disp);
-	sw=DisplayWidth(disp, snum);
-	sy=DisplayHeight(disp, snum);
+	snum = DefaultScreen(disp);
+	sw = DisplayWidth(disp, snum);
+	sy = DisplayHeight(disp, snum);
 	while(1){
 		XNextEvent(disp, &event);
 		if (XQueryTree(disp, root, &root, &parent, &children, &childw)) {
@@ -95,7 +101,7 @@ int main(){
 				pid = fork();
 				if(pid == 0) execv(dmenu[0], dmenu);
 			}else if(event.xkey.keycode == tg){
-				if(mode < 4) mode++;
+				if(mode < 5) mode++;
 				else mode=0;
 			}
 			if(childw < 1) continue;
@@ -160,6 +166,15 @@ int main(){
 			XRaiseWindow(disp, event.xbutton.subwindow);
 			XSetInputFocus(disp, event.xbutton.subwindow, RevertToNone, CurrentTime);
 		}
+		//DOESNT WORK IDK WHYY
+		/*else if(event.type == DestroyNotify){
+			if(XQueryTree(disp, root, &root, &parent, &children, &childw)){
+				if(childw >= 1)
+					XSetInputFocus(disp, children[0], RevertToNone, CurrentTime);
+				else
+					XSetInputFocus(disp, root, RevertToNone, CurrentTime);
+			}XGetInputFocus(disp, &fw, &revert);
+		}*/
 	}
 	XCloseDisplay(disp);
 	return 0;
