@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <X11/Xlib.h>
 #include <unistd.h>
-#include <math.h>
 #include "keymap.h"
 Display *disp;
 Window root, fw, parent, *children;
@@ -21,30 +20,52 @@ int tile(){
 	else if(mode == 2) XMoveResizeWindow(disp, fw, gaps, sy/2-mfact+gaps, sw-(gaps*2), sy/2+mfact-(gaps*2));
 	else if(mode == 3) XMoveResizeWindow(disp, fw, gaps, gaps, sw-(gaps*2), sy/2-mfact-gaps);
 	else if(mode == 4) XMoveResizeWindow(disp, fw, sw/2+mfact+gaps, gaps, sw/2-mfact-(gaps*2), sy-(gaps*2));
+	else if (mode == 5){
+		if(childw==2){
+			XMoveResizeWindow(disp, children[0], 0, 0, sw/2+mfact, sy);
+			XMoveResizeWindow(disp, children[1], sw/2, 0, sw/2, sy);
+		}
+		else{
+			int toph=childw/2;
+			int both=childw-toph;
+			for (int i; i < childw; i++){
+				if (i < toph){
+					XMoveResizeWindow(disp, children[i], i*(sw/toph), 0, sw/(toph), sy/2);
+				}else{
+					XMoveResizeWindow(disp, children[i], (i-toph)*(sw/both), sy/2, sw/(both), sy/2);
+				}
+			}
+		}
+		return 0;
+	}
 	for(int y = 0; y < childw; y++){
 		if(children[y] != fw){
 			if(mode == 1){
-				XMoveResizeWindow(disp, children[y], sw/2+mfact+gaps, chnotfw*(sy/(childw-1))+gaps, sw/2-mfact-(gaps*2), sy/(childw-1)-gaps);
 				if(chnotfw==childw-2){
 					XMoveResizeWindow(disp, children[y], sw/2+mfact+gaps, chnotfw*(sy/(childw-1))+gaps, sw/2-mfact-(gaps*2), sy/(childw-1)-(gaps*2));
+				}else{
+					XMoveResizeWindow(disp, children[y], sw/2+mfact+gaps, chnotfw*(sy/(childw-1))+gaps, sw/2-mfact-(gaps*2), sy/(childw-1)-gaps);
 				}
 			}
 			else if(mode == 2){
-				XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1))+gaps, gaps, sw/(childw-1)-gaps, sy/2-mfact-gaps);
 				if(chnotfw==childw-2){
 					XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1))+gaps, gaps, sw/(childw-1)-(gaps*2), sy/2-mfact-gaps);
+				}else{
+					XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1))+gaps, gaps, sw/(childw-1)-gaps, sy/2-mfact-gaps);
 				}
 			}
 			else if(mode == 3){
-				XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1))+gaps, sy/2-mfact+gaps, sw/(childw-1)-gaps, sy/2+mfact-(gaps*2));
 				if(chnotfw==childw-2){
 					XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1))+gaps, sy/2-mfact+gaps, sw/(childw-1)-(gaps*2), sy/2+mfact-(gaps*2));
+				}else{
+					XMoveResizeWindow(disp, children[y], chnotfw*(sw/(childw-1))+gaps, sy/2-mfact+gaps, sw/(childw-1)-gaps, sy/2+mfact-(gaps*2));
 				}
 			}
 			else if(mode == 4){
-				XMoveResizeWindow(disp, children[y], gaps, chnotfw*(sy/(childw-1))+gaps, sw/2+mfact-gaps, sy/(childw-1)-gaps);
 				if(chnotfw==childw-2){
 					XMoveResizeWindow(disp, children[y], gaps, chnotfw*(sy/(childw-1))+gaps, sw/2+mfact-gaps, sy/(childw-1)-(gaps*2));
+				}else{
+					XMoveResizeWindow(disp, children[y], gaps, chnotfw*(sy/(childw-1))+gaps, sw/2+mfact-gaps, sy/(childw-1)-gaps);
 				}
 			}
 			chnotfw++;
@@ -55,7 +76,7 @@ int tile(){
 }
 int main(){
 	if(!(disp = XOpenDisplay(0x0))){puts("cant open display :("); return 1;}
-	int arr[]={escwm, killc, tg, fs, sf, term, br, dm, mvl, mvd, mvu, mvr};
+	int arr[]={escwm, killc, tg, fs, rs, sf, term, br, dm, mvl, mvd, mvu, mvr};
 	int mvspeed = 30, rspeed=30;
 	root = DefaultRootWindow(disp);
 	int len = sizeof(arr)/sizeof(arr[0]);
@@ -146,17 +167,19 @@ int main(){
 					case fs:
 						XMoveResizeWindow(disp, fw, 0, 0, sw, sy);
 						break;
+					case rs:
+						XRaiseWindow(disp, fw);
+						break;
 					case sf:
 						for(int a = 0; a < childw; a++){
 							if(children[a] == fw){
 								if(a+1 < childw){
 									XSetInputFocus(disp, children[a+1], RevertToNone, CurrentTime);
-									XRaiseWindow(disp, children[a+1]);
 								}
 								else{
 									XSetInputFocus(disp, children[0], RevertToNone, CurrentTime);
-									XRaiseWindow(disp, children[0]);
 								}
+								break;
 							}
 						}
 						break;
